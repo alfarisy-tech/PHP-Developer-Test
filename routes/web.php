@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\DetailOrderController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,5 +17,22 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('login');
 });
+
+Auth::routes();
+
+Route::group(
+    ['middleware' => 'auth'],
+    function () {
+        Route::get('/prepaid-balance', [OrderController::class, 'index']);
+        Route::get('/product-page', [OrderController::class, 'productPage']);
+        Route::post('/prepaid-balance-submit', [OrderController::class, 'prepaidbalanceSubmit']);
+        Route::post('/product-page-submit', [OrderController::class, 'productpageSubmit']);
+        Route::get('success/{id}', [DetailOrderController::class, 'index'])->name('success');
+        Route::post('payment/', [DetailOrderController::class, 'store']);
+        Route::get('payments/{id}', [DetailOrderController::class, 'showPayment']);
+        Route::post('order-history', [DetailOrderController::class, 'orderHistory']);
+        Route::get('update-status/{id}', [DetailOrderController::class, 'updateStatus']);
+    }
+);
